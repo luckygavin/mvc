@@ -1,0 +1,21 @@
+要修改的文件只有controller.php和config.php
+veiws的文件加存放模版文件
+
+
+目录结构如下:
+index.php 		为入口文件
+config.php 		为配置文件，配置mysql数据的信息
+controller.php	为控制器，实现业务逻辑(主要)
+mvc --
+	Urls.php		路由
+	CController.php	被controller.php继承
+		run		用于执行相应的action，在Urls.php中被掉用
+		render	用于渲染页面
+	
+	Model.php		可视化数据库，把数据库里的表虚拟成类
+		find		取得一行数据
+		findAll	取得所有数据 
+		save		把对象中的数据同步到数据库中
+		delete	删除对象对应的在数据库中的那条数据
+
+veiws --	views里存放的是模版文件
