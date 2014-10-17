@@ -1,6 +1,6 @@
 要修改的文件只有controller.php和config.php
 veiws的文件加存放模版文件
-
+更详细的信息欢迎读源码。
 
 目录结构如下:
 index.php 		为入口文件
@@ -19,3 +19,5 @@ mvc --
 		delete	删除对象对应的在数据库中的那条数据
 
 veiws --	views里存放的是模版文件
+
+在博客里有记录一些： http://www.liuzechun.cn/index.php/blog/113
