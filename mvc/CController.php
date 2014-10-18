@@ -18,7 +18,7 @@ class CController{
 	/* 渲染页面 */
 	public function render($file,$values=array()){
 		//把数组变成变量
-		extract(&$values);
+		extract($values);
 		include('views/'.$file);
 	}
 }
