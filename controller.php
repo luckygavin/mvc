@@ -1,6 +1,4 @@
 <?php 
-include('mvc/CController.php');
-include('mvc/Model.php');
 class Controller extends CController{
 /* Content All controller functions */
 

@@ -1,6 +1,4 @@
 <?php
-include_once('config.php');
-
 /* 根据数据库自己检测/产生表名和字段名 */
 class Model{
 	private $con;

@@ -1,5 +1,4 @@
 <?php 	/* 路由作用 */
-include 'controller.php';
 class Urls{
 	private $url;
 	private $action;
