@@ -1,3 +1,4 @@
+<h1>Hello World!</h1>
 <?php
-	echo 'i am views and value:'.$i;
+	echo 'I am views and value:'.$i;
 ?>

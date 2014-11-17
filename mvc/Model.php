@@ -1,9 +1,19 @@
 <?php
 /* 根据数据库自己检测/产生表名和字段名 */
 class Model{
-	private $con;
-	private $table;
-	private $columns=array();
+	private $con;		//数据库连接的句柄
+	private $table;	//当前数据库表的名称，初始化时指定
+	private $columns=array(); //数据库中所有列对应的成员变量名
+	//private $attributes;	 //一次性给多个属性赋值时用到
+
+	/**
+	 * 通过静态函数构造一个对象
+	 * 参数 : 表名
+	 * 以此可以用 Model::get('tab')->findAll();
+	 */
+	public static function get($tab){
+		return new Model($tab);
+	}
 
 	/**
 	 * 构造函数
@@ -13,8 +23,7 @@ class Model{
 	public function __construct($table){
 		$this->table=$table;
 
-		$config = get_config();
-		$mysql = $config['db'];
+		$mysql = AppConfig::$db;
 		$con = mysql_connect($mysql['host'],$mysql['username'],$mysql['password']);
 		if(!$con){
 	  		die('Could not connect: ' . mysql_error());
@@ -29,11 +38,30 @@ class Model{
 			/* 获取表里的字段名并存到全局变量里 */
 			$result = $this->get_column_list($table);
 			foreach ($result as $key => $value) { 	
-				$this->$value = '';		//产生成员变量
-				$this->columns[] = $value;
+				$this->$value = NULL;		//产生成员变量
+				array_push($this->columns, $value);
 			}
 		}else{
 			throw new Exception("Error : There is not exist a table named ".$table, 1);
+		}
+	}
+
+	/**
+	 * 赋值 -- 魔术方法
+	 * 当给成员变量赋值时掉用此方法
+	 * 如果传入的value是数组,说明一次性给多个属性赋值,其键对应类成员变量名的值会赋值给成员变量
+	 * 否则是给单个成员变量赋值,直接赋值
+	 * 若属性不存在，则新建属性并赋值
+	 */
+	public function __set($attribute,$value){
+		if(is_array($value)){
+			foreach ($value as $key => $val) {
+				if(in_array($key, $this->columns)){
+					$this->$key = $val;
+				}
+			}			
+		}else{
+			$this->$attribute = $value;
 		}
 	}
 
@@ -42,8 +70,8 @@ class Model{
 	 * 若查询出多条数据，则返回第一条
 	 * 若没有数据则返回 NULL
 	 */
-	public function find($where='',$other=''){
-		$result = $this->select($where,$other);
+	public function find($condition=''){
+		$result = $this->select($condition." limit 1");
 		if(!$result)
 			$result[0] = NULL;
 		return $result[0];
@@ -53,9 +81,29 @@ class Model{
 	 * 返回所有数据
 	 * 若没有数据则返回空数组
 	 */
-	public function findAll($where='',$other=''){
-		$result = $this->select($where,$other);
+	public function findAll($condition=''){
+		$result = $this->select($condition);
 		return $result;
+	}
+
+	/**
+	 * 通过自定义的sql语句执行查询
+	 * return 查询结果的句柄
+	 */
+	public function findBySql($sql){
+		$result = mysql_query($sql, $this->con);
+		return $result;
+	}
+
+	/**
+	 * 获取数据总条数
+	 */
+	public function countAll($condition=''){
+		$sql = "select * from $this->table ";
+		if($condition)
+			$sql .= $condition;
+		$result = mysql_query($sql, $this->con);
+		return mysql_num_rows($result);
 	}
 
 	/**
@@ -63,7 +111,7 @@ class Model{
 	 */
 	public function save(){
 		$py_key = $this->columns[0];
-		if($this->$py_key!='')
+		if($this->$py_key!=NULL)
 			return $this->update();
 		else
 			return $this->insert();
@@ -81,9 +129,23 @@ class Model{
 
 	/********************************************************** 功能性函数(私有函数，仅供成员函数调用) ***********************************************************/
 	/**
+	 * 过滤各字段的值，防止注入
+	 */
+	private function filter(){
+		foreach ($this->columns as $value) {
+			$tmp = $this->$value;
+			$tmp = strip_tags($tmp);
+			$tmp = mysql_real_escape_string($tmp);
+			$tmp = trim($tmp);
+			$this->$value = $tmp;
+		}
+	}
+
+	/**
 	 * 更新数据库中的数据
 	 */
 	private function update(){
+		$this->filter();
 		$sql_value = '';
 		foreach ($this->columns as $key => $value) {
 			if($key == 0) 	//跳过主键.自增
@@ -101,6 +163,7 @@ class Model{
 	 * 向数据库中插入数据
 	 */
 	private function insert(){
+		$this->filter();
 		$sql_column = '';
 		$sql_value = '';
 		foreach ($this->columns as $key => $value) {
@@ -119,12 +182,10 @@ class Model{
 	 * 从数据库里取数据
 	 * return 一个对象数组
 	 */
-	private function select($where,$other){
+	private function select($condition){
 		$sql = "select * from $this->table ";
-		if($where)
-			$sql .= "where $where ";
-		if($other)
-			$sql .= $other;
+		if($condition)
+			$sql .= $condition;
 		$result = mysql_query($sql, $this->con);
 		$result_array = array();
 		while($row = mysql_fetch_assoc($result)){

@@ -1,11 +1,9 @@
-<?php 	/* This is my mvc entry */
-	//include的顺序不能变
-	include('config.php');
-	include('mvc/CController.php');
-	include('mvc/Model.php');
-	include 'controller.php';
-	include 'mvc/Urls.php';
-	$action = new Urls($_SERVER['PHP_SELF']);
-	//$action = new Urls('http://localhost/mvctest/index.php/index');
+<?php /* This is the entry of this website*/
+	// change the following paths if necessary
+	include(dirname(__FILE__).'/AppConfig.php'); 
+	//自动导入要用到的类文件
+	include(dirname(__FILE__).'/mvc/Autoload.php'); 
+	
+	$action = new Urls();
 	$action->run();
 ?>

@@ -1,23 +1,81 @@
-要修改的文件只有controller.php和config.php
-veiws的文件加存放模版文件
-更详细的信息欢迎读源码。
+Lii Version 2.0
+给框架命名为Lii - little it is (仿照Yii命名)
+
+要修改的文件只有Controller.php和AppConfig.php
+veiws的文件夹存放模版文件
+
 
 目录结构如下:
 index.php 		为入口文件
-config.php 		为配置文件，配置mysql数据的信息
-controller.php	为控制器，实现业务逻辑(主要)
+AppConfig.php 		为配置文件，配置mysql数据的信息
+Controller.php	为控制器，实现业务逻辑(主要)
 mvc --
 	Urls.php		路由
-	CController.php	被controller.php继承
-		run		用于执行相应的action，在Urls.php中被掉用
-		render	用于渲染页面
-	
+	CController.php	被controller.php继承	
 	Model.php		可视化数据库，把数据库里的表虚拟成类
-		find		取得一行数据
-		findAll	取得所有数据 
-		save		把对象中的数据同步到数据库中
-		delete	删除对象对应的在数据库中的那条数据
-
+	Lii.php		存放一些常用的函数 全局使用
+	Autoload.php	自动导入要事用的类文件，所有路径在AppConfig中配置
+	widget --
+		Pages.php	用于分页处理
 veiws --	views里存放的是模版文件
 
-在博客里有记录一些： http://www.liuzechun.cn/index.php/blog/113
+
+
+接口文档：
+Controller：
+	render('page.php',array())	渲染页面(对应views里的page.php)
+	直接定义方法，用URL ***/index.php/*** 即可访问在Controller中定义的方法
+	例如： localhost/index.php/home  即访问Controller.home()
+
+Lii：
+	Lii::app()->baseUrl   应用根目录相对localhost的路径
+	Lii::app()->basePath  应用根目录在服务器中的绝对路径
+	
+Model：
+	$attributes 	一次性给多个属性赋值
+	
+	get($tab_name)	静态方法 传入表名 返回一个model对象
+	find($condition)	获取一条数据，没有时返回null
+	findAll($condition)	获取所有数据，没有时返回空数组
+	findBySql($sql)	返回一个查询的句柄
+	countAll($condition)	获取数据总条数
+	save()  	把当前对象保存的数据同步到数据库中，可以是更新一条原数据，也可以是新插入一条数据
+	delete() 	删除当前对象对应在数据库中的数据
+	
+	例子1：
+		$result = Model::get('tab')->findAll();
+	例子2：
+		$model = Model('tab');
+		$count = $model->countAll('where id > 10');
+	例子3：
+		$new = Model('tab');
+		$new = $_POST;
+		$new->save();
+
+Pages：
+	$currentPage  当前页码
+	$pageCount 	  页总数
+	$pageSize	 每页的数据条数
+	
+	applyLimit(&$condition)	 调用时传入查询条件字符串的引用，在原来基础上加上limit语句
+	displayCode()	产生分页代码
+
+	例子：
+		$model = new Model('tab');
+		$condition = "order by id DESC";
+		$count = $model->countAll($condition);
+		$pages = new Pages($count);	//构造函数需要传入所有数据的总条数
+		$pages->pageSize = 10;
+		$pages->applyLimit($condition);
+		$this->render('back.php',array(
+				//'result'=>$result,
+				'pages'=>$pages,
+			));
+		//在back.php 中
+		$pages->displayCode();
+
+
+
+
+
+

@@ -4,8 +4,8 @@ class Urls{
 	private $action;
 	private $values=array();
 
-	public function __construct($url){
-		$this->url=$url;
+	public function __construct(){
+		$this->url = $_SERVER['PHP_SELF'];
 		$this->__route();
 	}
 
@@ -28,7 +28,7 @@ class Urls{
 
 	/* 执行相应的controller */
 	public function run(){
-		//echo $this->action;
+		session_start();
 		$controller = new Controller($this->action,$this->values);
 		$controller->run();
 	}
