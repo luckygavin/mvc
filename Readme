@@ -60,6 +60,7 @@ Lii：
 	Lii::app()->baseUrl   应用根目录相对localhost的路径
 	Lii::app()->basePath  应用根目录在服务器中的绝对路径
 	Lii::app()->homeUrl   home page
+
 Model：
 	$attributes 	一次性给多个属性赋值
 	new Model($tab_name)	可以不传入表名，但后面一定要调用setTable函数选定表，否则只能用findBySql函数
