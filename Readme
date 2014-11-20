@@ -1,6 +1,22 @@
-Lii Version 2.0
+Lii Version 3.0
 给框架命名为Lii - little it is (仿照Yii命名)
+函数命名规则：
+驼峰命名法
 
+V3-----------------------------------------------
+新增Error类和Base类
+添加了验证请求的action是否存在
+homeUrl
+异常处理机制
+layout机制 可以多层渲染
+Model中新加入findAllBySql的函数，返回的是对象数组
+新增String类 用于处理字符串相关的一些常用函数
+Base更改为被CController和Error继承，主要实现渲染有关的函数以供继承
+
+
+
+
+说明文档--------------------------------------------------------
 要修改的文件只有Controller.php和AppConfig.php
 veiws的文件夹存放模版文件
 
@@ -13,32 +29,49 @@ mvc --
 	Urls.php		路由
 	CController.php	被controller.php继承	
 	Model.php		可视化数据库，把数据库里的表虚拟成类
-	Lii.php		存放一些常用的函数 全局使用
-	Autoload.php	自动导入要事用的类文件，所有路径在AppConfig中配置
+	Lii.php		存放一些(用户)常用的函数 全局使用
+	Base.php		存放一些(系统)常用的函数
+	autoload.php	自动导入要事用的类文件，所有路径在AppConfig中配置
 	widget --
 		Pages.php	用于分页处理
-veiws --	views里存放的是模版文件
-
-
-
+		String.php	用于处理字符串相关的一些常用函数
+	Error.php		用于异常处理
+	views --
+		error.php	异常页面
+veiws --			views里存放的是模版文件
+ 	 error -- 
+ 	 	error.php	错误页面 （404）
+ 	 layout --
+ 	 	main.php	默认的要渲染的页面
+ 	 
+	 
 接口文档：
 Controller：
-	render('page.php',array())	渲染页面(对应views里的page.php)
+	render('page',array())	渲染页面(对应views里的page.php)，会先渲染layout(对应views/layout/下的文件（根据在controller中定义的layout属性来寻找）)，再把原页面嵌套到layout中去
+	renderPartial('page',array())  单纯渲染页面 ，不会加载layout
+	startContent($layout)	在layout页面里使用，实现多层渲染 （具体看demo）
+	endContent()	和startContent配套
 	直接定义方法，用URL ***/index.php/*** 即可访问在Controller中定义的方法
-	例如： localhost/index.php/home  即访问Controller.home()
+	例如： localhost/index.php/home  即访问Controller.home() 
+					      home后可以跟多个参数，用/隔开，依次对应函数要用到的参数
+		例如: localhost/index.php/home/1/20
 
 Lii：
 	Lii::app()->baseUrl   应用根目录相对localhost的路径
 	Lii::app()->basePath  应用根目录在服务器中的绝对路径
-	
+	Lii::app()->homeUrl   home page
 Model：
 	$attributes 	一次性给多个属性赋值
+	new Model($tab_name)	可以不传入表名，但后面一定要调用setTable函数选定表，否则只能用findBySql函数
+	get($tab_name)	静态方法 传入表名 返回一个model对象，同 new Model()
 	
-	get($tab_name)	静态方法 传入表名 返回一个model对象
+	以下的$condition如果是where子句时，可以缺省where(例如：find('id=1'))
 	find($condition)	获取一条数据，没有时返回null
 	findAll($condition)	获取所有数据，没有时返回空数组
-	findBySql($sql)	返回一个查询的句柄
 	countAll($condition)	获取数据总条数
+	findBySql($sql)	返回一个对象，不过不是Model对象，只是一个保存结果数据的普通对象
+	findAllBySql($sql)    返回一个对象数组，同上
+	
 	save()  	把当前对象保存的数据同步到数据库中，可以是更新一条原数据，也可以是新插入一条数据
 	delete() 	删除当前对象对应在数据库中的数据
 	
@@ -73,6 +106,18 @@ Pages：
 			));
 		//在back.php 中
 		$pages->displayCode();
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -1,4 +1,7 @@
-<?php 	/* 路由作用 */
+<?php 	
+/**
+ * 路由作用
+ */
 class Urls{
 	private $url;
 	private $action;
@@ -15,6 +18,7 @@ class Urls{
 		if($action!=''){
 			$tmp = explode('/', $action);
 			$this->action = $tmp[0];
+			//其余的量都是参数
 			unset($tmp[0]);
 			if($tmp){
 				foreach ($tmp as $value) {
@@ -28,9 +32,13 @@ class Urls{
 
 	/* 执行相应的controller */
 	public function run(){
-		session_start();
-		$controller = new Controller($this->action,$this->values);
-		$controller->run();
+		try{
+			session_start();
+			$controller = new Controller($this->action,$this->values);
+			$controller->run();
+		}catch(Exception $e){
+			new Error($e);
+		}
 	}
 }
 ?>

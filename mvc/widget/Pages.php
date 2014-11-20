@@ -1,5 +1,7 @@
 <?php
-/* 分页的类 */
+/**
+ * 分页的类
+ */
 class Pages{
 
 	private $dataCount;  	// 所有数据总行数
@@ -32,6 +34,7 @@ class Pages{
 			$this->currentPage = $_GET['page'];
 		}
 		$condition .= " limit $this->offset,$this->pageSize";
+		return true;
 	}
 
 	/**
