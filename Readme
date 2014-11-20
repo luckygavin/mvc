@@ -66,7 +66,7 @@ Model：
 	new Model($tab_name)	可以不传入表名，但后面一定要调用setTable函数选定表，否则只能用findBySql函数
 	get($tab_name)	静态方法 传入表名 返回一个model对象，同 new Model()
 	
-	以下的$condition如果是where子句时，可以缺省where(例如：find('id=1'))
+	以下的$condition如果where子句只是使用简单的 <>= 操作符时，可以缺省where(例如：find('id=1'))
 	find($condition)	获取一条数据，没有时返回null
 	findAll($condition)	获取所有数据，没有时返回空数组
 	countAll($condition)	获取数据总条数

@@ -219,7 +219,10 @@ class Model{
 		$sql_column = rtrim($sql_column,",");
 		$sql_value = rtrim($sql_value,",");
 		$sql = "insert into $this->table ($sql_column) values($sql_value)";
-		return $this->applyQuery($sql,$this->con);
+		$result = $this->applyQuery($sql,$this->con);
+		if($result)
+			$this->columns[0] = mysql_insert_id();
+		return $result;
 	}
 
 	/**
@@ -280,7 +283,7 @@ class Model{
 		if( !mysql_errno())  //mysql_errno() 返回一个错误码，若没有错误则返回0
 			return $result;
 		else
-			throw new Exception(mysql_error(), 500);
+			throw new Exception('DBerror-code:'.mysql_errno().' '.mysql_error(), 500);
 	}
 
 	/**
@@ -290,8 +293,8 @@ class Model{
 	private function joinSql($sql, $condition){
 		if($condition){
 			//补充缺省的where,如果需要的话
-			$first_word = substr($condition, 0, strpos($condition, ' '));
-			if(strpos($first_word, '='))
+			$first_word = $sub=strpos($condition, ' ')===false ? $condition : $sub;
+			if(strpos($first_word, '=') || strpos($first_word, '>') || strpos($first_word, '<'))
 				$condition = 'where '.$condition;
 			$sql .= $condition;
 		}
