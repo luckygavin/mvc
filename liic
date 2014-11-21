@@ -1,0 +1,19 @@
+#!/bin/bash 
+if [ $# -lt 1 ]
+then
+    echo "Error: This command requires a parameter as the project name."
+    exit -1
+fi
+base=`dirname $0`
+path=`pwd`
+dirpath=$path"/"$1
+printf "Create a Web application under '%s'? (yes|no) [no]:" $dirpath
+read ok
+if [ "$ok" = "y" -o "$ok" = "yes" ]
+then
+    cp -r $base $dirpath 
+    cd $dirpath
+    rm -rf ./.git ./.old_version
+    echo "Your application has been created successfully under " $dirpath
+    
+fi
