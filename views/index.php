@@ -1,6 +1,8 @@
 <h1>Hello World!</h1>
+<h3>Readme</h3>
 <?php
-	echo "I am views and value:";
-	print_r($i);
-	echo "<br>";
+	$readme=file(Lii::app()->basePath.'/Readme');
+	foreach ($readme as $value) {
+		echo $value."<br>";
+	}
 ?>
