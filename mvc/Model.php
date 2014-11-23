@@ -5,8 +5,9 @@
 class Model{
 	private $con;		//数据库连接的句柄
 	private $table;	//当前数据库表的名称，初始化时指定
+	//private $_newColumn=true;  //是否是新一行
+	private $_attributes=array();	 //一次性给多个属性赋值时用到
 	public $columns=array(); //数据库中所有列对应的成员变量名
-	//private $attributes;	 //一次性给多个属性赋值时用到
 
 	/**
 	 * 通过静态函数构造一个对象
@@ -48,7 +49,7 @@ class Model{
 			/* 获取表里的字段名并存到全局变量里 */
 			$result = $this->getColumnList($table);
 			foreach ($result as $key => $value) { 	
-				$this->$value = NULL;		//产生成员变量
+				$this->_attributes["$value"] = NULL;		
 				array_push($this->columns, $value);
 			}
 		}else{
@@ -68,13 +69,24 @@ class Model{
 			if(is_array($value)){
 				foreach ($value as $key => $val) {
 					if(in_array($key, $this->columns)){
-						$this->$key = $val;
+						$this->_attributes["$key"] = $val;
 					}
 				}
 			}
 		}else{
-			$this->$attribute = $value;
+			$this->_attributes["$attribute"] = $value;
 		}
+	}
+
+	/**
+	 * 取值 -- 魔术方法
+	 * 获取成员变量
+	 */
+	public function __get($attribute){
+		if(array_key_exists($attribute, $this->_attributes))
+			return $this->_attributes["$attribute"];
+		else
+			throw new Exception("Error : There is not exist a column named ".$attribute, 500);
 	}
 
 	/**
@@ -150,7 +162,7 @@ class Model{
 	 */
 	public function save(){
 		$py_key = $this->columns[0];
-		if($this->$py_key!=NULL)
+		if($this->_attributes["$py_key"]!=NULL)
 			return $this->update();
 		else
 			return $this->insert();
@@ -195,7 +207,7 @@ class Model{
 		foreach ($this->columns as $key => $value) {
 			if($key == 0) 	//跳过主键.自增
 				continue;
-			$sql .= $value."='$this->$value',";
+			$sql .= $value."='".$this->_attributes["$value"]."',";
 		}
 		rtrim($sql_value,',');
 		$py_key = $this->columns[0];
@@ -214,7 +226,7 @@ class Model{
 			if($key == 0) 	//跳过主键.自增
 				continue;
 			$sql_column .= $value.',';
-			$sql_value .= "'".$this->$value."',";
+			$sql_value .= "'".$this->_attributes["$value"]."',";
 		}
 		$sql_column = rtrim($sql_column,",");
 		$sql_value = rtrim($sql_value,",");
@@ -236,10 +248,7 @@ class Model{
 
 		$result_array = array();
 		while($row = mysql_fetch_assoc($result)){
-			foreach ($row as $key => $value) {
-				//$columns = $this->columns;
-				$this->$key = $value;
-			}
+			$this->_attributes = $row;
 			$this_model = clone $this;
 			$result_array[] = $this_model;
 		}
@@ -266,7 +275,7 @@ class Model{
 	 */
 	private function getColumnList($table){
 		$rs = mysql_query("DESC $table",$this->con);
-	    	$columns = array();
+		$columns = array();
 	    	while ($row = mysql_fetch_row($rs)) {
 	        		$columns[] = $row[0];
 	    	}
@@ -283,7 +292,7 @@ class Model{
 		if( !mysql_errno())  //mysql_errno() 返回一个错误码，若没有错误则返回0
 			return $result;
 		else
-			throw new Exception('DBerror-code:'.mysql_errno().' '.mysql_error(), 500);
+			throw new Exception('DB Error:'.mysql_errno().' '.mysql_error(), 500);
 	}
 
 	/**
