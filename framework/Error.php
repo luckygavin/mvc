@@ -37,7 +37,7 @@ class Error extends Base
 	 * 开启debug模式的错误处理
 	 */
 	public function debugError($e){
-		$this->viewPath = 'application.mvc.views';
+		$this->viewPath = AppConfig::$includePath["framework"].'.views';
 		$trace = $e->getTrace();
 		foreach($trace as $i=>$t){
 			if(!isset($t['file']))

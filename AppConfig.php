@@ -16,15 +16,15 @@ class AppConfig {
 			'password'=>'admin',
 		);
 	//debug模式开关
-	public static $debug = false;
+	public static $debug = true;
 
 	/********************************************************** 一般不用改的配置 ***********************************************************/
 	//自动导入框架的类文件的路径
 	//仅添加自定义扩展类时要添加扩展类的路径
 	public static $includePath = array(
-			'application',	//应用根目录
-			'application.framework',
-			'application.framework.widget',
+			'application'	=>'application',	//应用根目录
+			'framework'	=>'application.framework',
+			'widget'	=>'application.framework.widget',
 		);
 
 }

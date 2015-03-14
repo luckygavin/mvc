@@ -28,6 +28,8 @@ class Urls{
 		}else{
 			$this->action='index';
 		}
+		$this->action = 'action'.ucfirst($this->action); 	//更换为actionIndex形式
+									//防止开发者自定义的函数不小心声明为public而被用户直接访问到
 	}
 
 	/* 执行相应的controller */

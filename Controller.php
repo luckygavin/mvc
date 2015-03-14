@@ -5,7 +5,7 @@ class Controller extends CController
 {
 	public $layout = 'main';
 	/* 默认的函数:action为空时默认为执行此函数 */	
-	public function index(){
+	public function actionIndex(){
 		$this->layout = 'leftSide';
 		$this->render('index',array('i'=>1));
 	}
