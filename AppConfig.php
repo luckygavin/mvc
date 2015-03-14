@@ -23,8 +23,8 @@ class AppConfig {
 	//仅添加自定义扩展类时要添加扩展类的路径
 	public static $includePath = array(
 			'application',	//应用根目录
-			'application.mvc',
-			'application.mvc.widget',
+			'application.framework',
+			'application.framework.widget',
 		);
 
 }

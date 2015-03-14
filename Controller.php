@@ -1,6 +1,6 @@
 <?php 
 /* Content All controller functions */
-require(dirname(__FILE__).'/mvc/CController.php');
+require(dirname(__FILE__).'/framework/CController.php');
 class Controller extends CController
 {
 	public $layout = 'main';
